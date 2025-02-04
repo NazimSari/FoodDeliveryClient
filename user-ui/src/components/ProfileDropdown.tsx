@@ -5,12 +5,17 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-} from "@heroui/dropdown";
+} from "@heroui/react";
 import { CgProfile } from "react-icons/cg";
 import { useState } from "react";
+import AuthScreen from "../screens/AuthScreen";
 
 const ProfileDropdown = () => {
   const [signedIn, setSignedIn] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const FixedDropdownItem = DropdownItem as any;
+  const FixedIcon = CgProfile as any;
 
   return (
     <div className="flex items-center gap-4">
@@ -24,23 +29,27 @@ const ProfileDropdown = () => {
             />
           </DropdownTrigger>
           <DropdownMenu arial-label="Profile Actions" variant="flat">
-            <DropdownItem key="profile" className="h-14 gap-2">
+            <FixedDropdownItem key="profile" className="h-14 gap-2">
               <p className="font-semibold">Signed in as</p>
               <p className="font-semibold">digitaslistway@gmail.com</p>
-            </DropdownItem>
-            <DropdownItem key="settings">My Profile</DropdownItem>
-            <DropdownItem key="all_orders">All Orders</DropdownItem>
-            <DropdownItem key="apply_account">
+            </FixedDropdownItem>
+            <FixedDropdownItem key="settings">My Profile</FixedDropdownItem>
+            <FixedDropdownItem key="all_orders">All Orders</FixedDropdownItem>
+            <FixedDropdownItem key="apply_account">
               Apply For Seller Account
-            </DropdownItem>
-            <DropdownItem key="logout" color="danger">
+            </FixedDropdownItem>
+            <FixedDropdownItem key="logout" color="danger">
               Log Out
-            </DropdownItem>
+            </FixedDropdownItem>
           </DropdownMenu>
         </Dropdown>
       ) : (
-        <CgProfile className="text-2xl cursor-pointer" />
+        <FixedIcon
+          className="text-2xl cursor-pointer"
+          onClick={() => setOpen(!open)}
+        />
       )}
+      {open && <AuthScreen />}
     </div>
   );
 };
