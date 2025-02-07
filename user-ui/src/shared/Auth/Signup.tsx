@@ -9,6 +9,9 @@ import {
   AiOutlineEyeInvisible,
 } from "react-icons/ai";
 import { useState } from "react";
+import { useMutation } from "@apollo/client";
+import { REGISTER_USER } from "@/src/graphql/actions/register.action";
+import toast from "react-hot-toast";
 
 const formSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters!!"),
@@ -29,6 +32,8 @@ const Signup = ({
 }: {
   setActiveState: (e: string) => void;
 }) => {
+  const [registerUserMutation, { loading, error, data }] =
+    useMutation(REGISTER_USER);
   const {
     register,
     handleSubmit,
@@ -39,9 +44,17 @@ const Signup = ({
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const onSubmit = (data: SignUpSchema) => {
-    console.log(data);
-    reset();
+  const onSubmit = async (data: SignUpSchema) => {
+    try {
+      const response = await registerUserMutation({
+        variables: data,
+      });
+      localStorage.setItem("activation_token", response.data.activation_token);
+      toast.success("Please check your email to activate your account");
+      reset();
+    } catch (error: any) {
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -71,7 +84,7 @@ const Signup = ({
         <div className="w-full mt-2 relative mb-3">
           <label className={`${styles.label}`}>Enter your phone number</label>
           <input
-            {...register("phone_number")}
+            {...register("phone_number", { valueAsNumber: true })}
             type="number"
             placeholder="0(000)000-0000"
             className={`${styles.input}`}
@@ -109,7 +122,7 @@ const Signup = ({
             type="submit"
             value="Sign Up"
             className={`${styles.button} mt-3`}
-            disabled={isSubmitting}
+            disabled={isSubmitting || loading}
           />
         </div>
         <br />
