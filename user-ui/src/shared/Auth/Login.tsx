@@ -60,9 +60,7 @@ const Login = ({ setActiveState }: { setActiveState: (e: string) => void }) => {
             placeholder="********"
             className={`${styles.input}`}
           />
-          {errors.password && (
-            <span className="text-red-500">{`${errors.password.message}`}</span>
-          )}
+
           {!showPassword ? (
             <FixedAiOutlineEyeInvisible
               size={20}
@@ -77,6 +75,9 @@ const Login = ({ setActiveState }: { setActiveState: (e: string) => void }) => {
             />
           )}
         </div>
+        {errors.password && (
+          <span className="text-red-500">{`${errors.password.message}`}</span>
+        )}
         <div className="w-full mt-5">
           <span
             className={`${styles.label}  text-blue-500 block text-right cursor-pointer`}
