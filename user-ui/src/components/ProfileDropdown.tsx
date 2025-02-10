@@ -7,15 +7,32 @@ import {
   DropdownTrigger,
 } from "@heroui/react";
 import { CgProfile } from "react-icons/cg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AuthScreen from "../screens/AuthScreen";
+import useUser from "../hooks/useUser";
+import toast from "react-hot-toast";
+import Cookies from "js-cookie";
 
 const ProfileDropdown = () => {
   const [signedIn, setSignedIn] = useState(false);
   const [open, setOpen] = useState(false);
+  const { user, loading } = useUser();
 
   const FixedDropdownItem = DropdownItem as any;
   const FixedIcon = CgProfile as any;
+
+  useEffect(() => {
+    if (!loading) {
+      setSignedIn(!!user);
+    }
+  }, [loading, user]);
+
+  const logOutHandler = () => {
+    Cookies.remove("access_token");
+    Cookies.remove("refresh_token");
+    toast.success("Log out successfully!");
+    window.location.reload();
+  };
 
   return (
     <div className="flex items-center gap-4">
@@ -25,20 +42,24 @@ const ProfileDropdown = () => {
             <Avatar
               as="button"
               className="transition-transform"
-              src="https://next-blog-front-gold.vercel.app/img/Monkey-icon.png"
+              src={user?.avatar?.url}
             />
           </DropdownTrigger>
           <DropdownMenu arial-label="Profile Actions" variant="flat">
             <FixedDropdownItem key="profile" className="h-14 gap-2">
               <p className="font-semibold">Signed in as</p>
-              <p className="font-semibold">digitaslistway@gmail.com</p>
+              <p className="font-semibold">{user.email}</p>
             </FixedDropdownItem>
             <FixedDropdownItem key="settings">My Profile</FixedDropdownItem>
             <FixedDropdownItem key="all_orders">All Orders</FixedDropdownItem>
             <FixedDropdownItem key="apply_account">
               Apply For Seller Account
             </FixedDropdownItem>
-            <FixedDropdownItem key="logout" color="danger">
+            <FixedDropdownItem
+              key="logout"
+              color="danger"
+              onClick={logOutHandler}
+            >
               Log Out
             </FixedDropdownItem>
           </DropdownMenu>
