@@ -9,6 +9,10 @@ import {
   AiOutlineEyeInvisible,
 } from "react-icons/ai";
 import { useState } from "react";
+import toast from "react-hot-toast";
+import { useMutation } from "@apollo/client";
+import { LOGIN_USER } from "@/src/graphql/actions/login.actions";
+import Cookies from "js-cookie";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -20,7 +24,14 @@ const FixedAiOutlineEyeInvisible = AiOutlineEyeInvisible as any;
 const FixedAiOutlineEye = AiOutlineEye as any;
 
 type LoginSchema = z.infer<typeof formSchema>;
-const Login = ({ setActiveState }: { setActiveState: (e: string) => void }) => {
+const Login = ({
+  setActiveState,
+  setOpen,
+}: {
+  setActiveState: (e: string) => void;
+  setOpen: (e: boolean) => void;
+}) => {
+  const [Login, { loading }] = useMutation(LOGIN_USER);
   const {
     register,
     handleSubmit,
@@ -31,9 +42,23 @@ const Login = ({ setActiveState }: { setActiveState: (e: string) => void }) => {
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const onSubmit = (data: LoginSchema) => {
-    console.log(data);
-    reset();
+  const onSubmit = async (data: LoginSchema) => {
+    const loginData = {
+      email: data.email,
+      password: data.password,
+    };
+
+    const response = await Login({
+      variables: loginData,
+    });
+    if (response.data.Login.user) {
+      toast.success("Login successfully");
+      Cookies.set("refresh_token", response.data.Login.refreshToken);
+      Cookies.set("access_token", response.data.Login.accessToken);
+      setOpen(false);
+    } else {
+      toast.error(response.data.Login.error.message);
+    }
   };
 
   return (
@@ -88,7 +113,7 @@ const Login = ({ setActiveState }: { setActiveState: (e: string) => void }) => {
             type="submit"
             value="Login"
             className={`${styles.button} mt-3`}
-            disabled={isSubmitting}
+            disabled={isSubmitting || loading}
           />
         </div>
         <br />
