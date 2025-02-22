@@ -12,7 +12,8 @@ import AuthScreen from "../screens/AuthScreen";
 import useUser from "../hooks/useUser";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import { registerUser } from "../actions/register-user";
 
 const ProfileDropdown = () => {
   const [signedIn, setSignedIn] = useState(false);
@@ -29,7 +30,7 @@ const ProfileDropdown = () => {
     }
     if (data?.user) {
       setSignedIn(true);
-      addUser();
+      addUser(data?.user);
     }
   }, [loading, user, open, data]);
 
@@ -40,7 +41,9 @@ const ProfileDropdown = () => {
     window.location.reload();
   };
 
-  const addUser = async () => {};
+  const addUser = async (user: any) => {
+    await registerUser(user);
+  };
 
   return (
     <div className="flex items-center gap-4">
@@ -68,7 +71,7 @@ const ProfileDropdown = () => {
             <FixedDropdownItem
               key="logout"
               color="danger"
-              onClick={logOutHandler}
+              onClick={() => signOut() || logOutHandler}
             >
               Log Out
             </FixedDropdownItem>
