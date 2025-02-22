@@ -3,23 +3,19 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FcGoogle } from "react-icons/fc";
-import {
-  AiFillGithub,
-  AiOutlineEye,
-  AiOutlineEyeInvisible,
-} from "react-icons/ai";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useMutation } from "@apollo/client";
 import { LOGIN_USER } from "@/src/graphql/actions/login.actions";
 import Cookies from "js-cookie";
+import { signIn } from "next-auth/react";
 
 const formSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8, "Password must be at least 8 characters!!"),
 });
 const FixedGoogle = FcGoogle as any;
-const FixedGithub = AiFillGithub as any;
 const FixedAiOutlineEyeInvisible = AiOutlineEyeInvisible as any;
 const FixedAiOutlineEye = AiOutlineEye as any;
 
@@ -32,6 +28,7 @@ const Login = ({
   setOpen: (e: boolean) => void;
 }) => {
   const [Login, { loading }] = useMutation(LOGIN_USER);
+
   const {
     register,
     handleSubmit,
@@ -121,9 +118,11 @@ const Login = ({
         </div>
         <br />
         <h5 className="text-center pt-4 text-base text-white">Or join with</h5>
-        <div className="flex items-center justify-center my-3">
+        <div
+          className="flex items-center justify-center my-3"
+          onClick={() => signIn()}
+        >
           <FixedGoogle size={30} className="cursor-pointer mr-2" />
-          <FixedGithub size={30} className="cursor-pointer ml-2" />
         </div>
         <h5 className="text-center pt-4 text-base">
           Not have any account?{" "}

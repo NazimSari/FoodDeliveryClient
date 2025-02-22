@@ -12,11 +12,13 @@ import AuthScreen from "../screens/AuthScreen";
 import useUser from "../hooks/useUser";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
+import { useSession } from "next-auth/react";
 
 const ProfileDropdown = () => {
   const [signedIn, setSignedIn] = useState(false);
   const [open, setOpen] = useState(false);
   const { user, loading } = useUser();
+  const { data } = useSession();
 
   const FixedDropdownItem = DropdownItem as any;
   const FixedIcon = CgProfile as any;
@@ -25,7 +27,11 @@ const ProfileDropdown = () => {
     if (!loading) {
       setSignedIn(!!user);
     }
-  }, [loading, user]);
+    if (data?.user) {
+      setSignedIn(true);
+      addUser();
+    }
+  }, [loading, user, open, data]);
 
   const logOutHandler = () => {
     Cookies.remove("access_token");
@@ -33,6 +39,8 @@ const ProfileDropdown = () => {
     toast.success("Log out successfully!");
     window.location.reload();
   };
+
+  const addUser = async () => {};
 
   return (
     <div className="flex items-center gap-4">
@@ -42,13 +50,15 @@ const ProfileDropdown = () => {
             <Avatar
               as="button"
               className="transition-transform"
-              src={user?.avatar?.url}
+              src={data?.user ? data.user.image : user.image}
             />
           </DropdownTrigger>
           <DropdownMenu arial-label="Profile Actions" variant="flat">
             <FixedDropdownItem key="profile" className="h-14 gap-2">
               <p className="font-semibold">Signed in as</p>
-              <p className="font-semibold">{user.email}</p>
+              <p className="font-semibold">
+                {data?.user ? data.user.email : user.email}
+              </p>
             </FixedDropdownItem>
             <FixedDropdownItem key="settings">My Profile</FixedDropdownItem>
             <FixedDropdownItem key="all_orders">All Orders</FixedDropdownItem>
